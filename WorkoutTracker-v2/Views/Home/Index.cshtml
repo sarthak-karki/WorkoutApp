@@ -1,0 +1,32 @@
+﻿@model Workout
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Your Workout For this Week!</h1>
+</div>
+
+<div style="margin-top: 50px">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>WokrOutName</th>
+                <th>Type</th>
+                <th>Sets</th>
+                <th>Reps</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var v in Model.Exercises)
+            {
+                <tr>
+                    <td>@v.Name</td>
+                    <td>@v.Type</td>
+                    <td>@v.Sets</td>
+                    <td>@v.Reps</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
