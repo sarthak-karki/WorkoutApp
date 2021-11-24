@@ -16,7 +16,7 @@ namespace WorkoutTracker_v2.Repositories
         // This needs to be Data'based
         private List<UserProfile> users = new List<UserProfile>
         {
-            new UserProfile { UserId = 1, UserName = "Car-Key", isActive = true, PassWord = "OIVVcODUDJAJVwJKsbZg0bL+Pxe77ZyxWPFDjCj0ems=" }
+            new UserProfile { UserId = 1, UserName = "Car-Key", isActive = true, PassWord = "RsZpbkHqf+jmXUPa8ITyOb1YU1vt/MpsWioKcVM6aUI=" }
         };
 
         public UserProfile GetUsernameAndPassword(string username, string password)

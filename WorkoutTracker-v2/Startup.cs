@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -35,8 +36,24 @@ namespace WorkoutTracker_v2
             services.AddRazorPages().AddMvcOptions(o => o.Filters.Add(new AuthorizeFilter()))
                 .AddRazorRuntimeCompilation();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            /*
+            services.AddAuthentication( CookieAuthenticationDefaults.AuthenticationScheme )
                 .AddCookie();
+            */
+                
+            
+            services.AddAuthentication(o => {
+                o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                // o.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            })
+                .AddCookie()
+                .AddCookie(ExternalAuthenticationDefaults.AuthenticationScheme)
+                .AddGoogle(o =>
+                {
+                    o.ClientId = Configuration["Google:ClientId"]; 
+                    o.ClientSecret = Configuration["Google:ClientSecret"]; 
+                });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

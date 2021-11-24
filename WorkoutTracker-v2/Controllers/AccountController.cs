@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.Google;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using WorkoutTracker_v2.Models;
 using WorkoutTracker_v2.Repositories;
+
 
 namespace WorkoutTracker_v2.Controllers
 {
@@ -63,7 +65,29 @@ namespace WorkoutTracker_v2.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Redirect("/");
+
+
+            return Redirect("https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=https://localhost:44393/");
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleLoginCallback()
+        {
+            return LocalRedirect("/");
+        }
+
+        [AllowAnonymous]
+        public IActionResult LoginWithGoogle(string returnUrl = "/")
+        {
+            var props = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("GoogleLoginCallback"),
+                Items =
+                {
+                    { "returnUrl", returnUrl }
+                }
+            };
+            return Challenge(props, GoogleDefaults.AuthenticationScheme);
         }
     }
 }
