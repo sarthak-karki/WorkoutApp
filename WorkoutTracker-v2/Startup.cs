@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WorkoutTracker_v2.Data;
 using WorkoutTracker_v2.Repositories;
+using WorkoutTracker_v2.Services;
 
 namespace WorkoutTracker_v2
 {
@@ -32,6 +33,7 @@ namespace WorkoutTracker_v2
 
             services.AddControllersWithViews(o => o.Filters.Add(new AuthorizeFilter()));
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IDapperService, DapperService>();
 
             services.AddRazorPages().AddMvcOptions(o => o.Filters.Add(new AuthorizeFilter()))
                 .AddRazorRuntimeCompilation();
@@ -50,6 +52,7 @@ namespace WorkoutTracker_v2
                 .AddCookie(ExternalAuthenticationDefaults.AuthenticationScheme)
                 .AddGoogle(o =>
                 {
+                    o.SignInScheme = ExternalAuthenticationDefaults.AuthenticationScheme;
                     o.ClientId = Configuration["Google:ClientId"]; 
                     o.ClientSecret = Configuration["Google:ClientSecret"]; 
                 });

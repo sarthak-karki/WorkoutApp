@@ -11,5 +11,6 @@ namespace WorkoutTracker_v2.Models
         public string UserName { get; set; }
         public string PassWord { get; set; }
         public bool isActive { get; set; }
+        public string Email { get; set; }
     }
 }

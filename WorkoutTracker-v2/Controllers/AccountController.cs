@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using WorkoutTracker_v2.Models;
 using WorkoutTracker_v2.Repositories;
-
+using System.Linq;
 
 namespace WorkoutTracker_v2.Controllers
 {
@@ -64,8 +64,9 @@ namespace WorkoutTracker_v2.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            // Sign out is not working as expected for non-Gmail signin. It attempts to sign out gmail account everytime.
 
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return Redirect("https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=https://localhost:44393/");
         }
@@ -73,7 +74,37 @@ namespace WorkoutTracker_v2.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GoogleLoginCallback()
         {
-            return LocalRedirect("/");
+            var result = await HttpContext.AuthenticateAsync(
+                ExternalAuthenticationDefaults.AuthenticationScheme);
+
+            var externalClaims = result.Principal.Claims.ToList();
+
+            var userEmail = externalClaims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+
+            var subjectValue = userEmail.Value;
+
+            var user = _userRepository.GetUserByEmail(subjectValue);
+
+            if (user == null)
+            {
+                // Create a new user!
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName)
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignOutAsync(ExternalAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+            return LocalRedirect(result.Properties.Items["returnUrl"]);
+            // return LocalRedirect("/");
         }
 
         [AllowAnonymous]
