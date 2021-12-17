@@ -312,3 +312,6 @@ sh.exe.stackdump
 # https://bizcover.atlassian.net/wiki/spaces/DEVOPS/pages/1545863910/Nuget.config
 nuget.config
 .deployments/*.text.json
+
+# Ignoring appsettings in git
+appsettings.json
