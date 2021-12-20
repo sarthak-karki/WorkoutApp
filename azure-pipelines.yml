@@ -17,7 +17,7 @@ steps:
   displayName: 'Use .NET Core sdk'
   inputs:
     packageType: sdk
-    version: 6.0.0
+    version: 6.0
     installationPath: $(Agent.ToolsDirectory)/dotnet
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
