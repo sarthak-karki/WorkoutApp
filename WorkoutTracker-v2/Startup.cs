@@ -25,15 +25,14 @@ namespace WorkoutTracker_v2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddControllersWithViews(o => o.Filters.Add(new AuthorizeFilter()));
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddSingleton<DapperContext>();
+            services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             services.AddScoped<IDapperService, DapperService>();
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddControllersWithViews(o => o.Filters.Add(new AuthorizeFilter()));
+
 
             services.AddRazorPages().AddMvcOptions(o => o.Filters.Add(new AuthorizeFilter()))
                 .AddRazorRuntimeCompilation();

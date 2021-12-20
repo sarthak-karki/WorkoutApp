@@ -3,125 +3,79 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Linq;
 
 namespace WorkoutTracker_v2.Services
 {
-    public interface IDapperService : IDisposable
+    public interface IDapperService
     {
-        DbConnection GetDbconnection();
-        T Get<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
-        IList<T> GetAll<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
-        int Execute(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
-        T Insert<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
-        T Update<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
-
+        public IEnumerable<T> ExecuteQuery<T>(string sql);
+        public IEnumerable<T> ExecuteQuery<T>(string sql, object param);
+        public int Insert(string sql);
+        public int Insert(string sql, object param);
     }
 
     public class DapperService : IDapperService
     {
         private readonly IConfiguration _config;
-        private string Connectionstring = "DefaultConnection";
+        private string ConnectionString = "DefaultConnection";
 
         public DapperService(IConfiguration config)
         {
             _config = config;
-        }
-        public void Dispose()
-        {
+         }
 
-        }
-
-        public int Execute(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
+        public IEnumerable<T> ExecuteQuery<T>(string sql)
         {
-            throw new NotImplementedException();
+            return ExecuteQuery<T>(sql, null);
         }
 
-        public T Get<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.Text)
+        public IEnumerable<T> ExecuteQuery<T>(string sql, object param)
         {
-            using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
-            return db.Query<T>(sp, parms, commandType: commandType).FirstOrDefault();
-        }
-
-        public IList<T> GetAll<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
-        {
-            using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
-            return db.Query<T>(sp, parms, commandType: commandType).ToList();
-        }
-
-        public DbConnection GetDbconnection()
-        {
-            return new SqlConnection(_config.GetConnectionString(Connectionstring));
-        }
-
-        public T Insert<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
-        {
-            T result;
-            using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
             try
             {
-                if (db.State == ConnectionState.Closed)
-                    db.Open();
-
-                using var tran = db.BeginTransaction();
-                try
+                using (var connection = new SqlConnection(_config.GetConnectionString(ConnectionString)))
                 {
-                    result = db.Query<T>(sp, parms, commandType: commandType, transaction: tran).FirstOrDefault();
-                    tran.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tran.Rollback();
-                    throw ex;
+                    return connection.Query<T>(sql, param);
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                Console.WriteLine(ex.ToString());
+                throw;
             }
-            finally
-            {
-                if (db.State == ConnectionState.Open)
-                    db.Close();
-            }
-
-            return result;
         }
 
-        public T Update<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
+        public int Insert(string sql)
         {
-            T result;
-            using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
             try
             {
-                if (db.State == ConnectionState.Closed)
-                    db.Open();
-
-                using var tran = db.BeginTransaction();
-                try
+                using (var connection = new SqlConnection(_config.GetConnectionString(ConnectionString)))
                 {
-                    result = db.Query<T>(sp, parms, commandType: commandType, transaction: tran).FirstOrDefault();
-                    tran.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tran.Rollback();
-                    throw;
+                    return connection.ExecuteScalar<int>(sql);
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                Console.WriteLine(ex.ToString());
+                throw;
             }
-            finally
-            {
-                if (db.State == ConnectionState.Open)
-                    db.Close();
-            }
-
-            return result;
         }
+
+        public int Insert(string sql, object param)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_config.GetConnectionString(ConnectionString)))
+                {
+                    return connection.ExecuteScalar<int>(sql, param);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+        }
+
     }
 }
