@@ -37,12 +37,6 @@ namespace WorkoutTracker_v2
             services.AddRazorPages().AddMvcOptions(o => o.Filters.Add(new AuthorizeFilter()))
                 .AddRazorRuntimeCompilation();
 
-            /*
-            services.AddAuthentication( CookieAuthenticationDefaults.AuthenticationScheme )
-                .AddCookie();
-            */
-                
-            
             services.AddAuthentication(o => {
                 o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 // o.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
