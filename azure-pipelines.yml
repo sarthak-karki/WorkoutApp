@@ -18,11 +18,15 @@ steps:
     folderPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
     targetFiles: '**/appsettings.json'
     fileType: json
+
 - task: UseDotNet@2
   displayName: 'Use .NET Core sdk'
   inputs:
     packageType: sdk
     version: 6.0.x
     installationPath: $(Agent.ToolsDirectory)/dotnet
+
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+  
+- task: PublishBuildArtifacts@1
