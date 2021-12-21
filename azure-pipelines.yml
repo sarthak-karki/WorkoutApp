@@ -11,8 +11,19 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  ConnectionStrings.DefaultConnection: $(ConnectionStrings.DefaultConnection)
+  Google.ClientId: $(Google.ClientId)
+  Google.ClientSecret: $(Google.ClientSecret)
   
 steps:
+
+# Update appsettings.json via FileTransform task.
+- task: FileTransform@1
+  displayName: 'File transformation: appsettings.json'
+  inputs:
+    folderPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    targetFiles: '**/appsettings.json'
+    fileType: json
 - task: UseDotNet@2
   displayName: 'Use .NET Core sdk'
   inputs:
