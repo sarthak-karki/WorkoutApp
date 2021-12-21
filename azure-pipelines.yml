@@ -6,12 +6,6 @@ pool:
   name: Azure Pipelines
 
 steps:
-- task: DotNetCoreCLI@2
-  displayName: Restore
-  inputs:
-    command: restore
-    projects: '$(Parameters.RestoreBuildProjects)'
-
 - task: FileTransform@1
   displayName: 'File Transform: '
   inputs:
@@ -19,11 +13,8 @@ steps:
     fileType: json
     targetFiles: appsettings.json
 
-- task: DotNetCoreCLI@2
-  displayName: Build
-  inputs:
-    projects: '$(Parameters.RestoreBuildProjects)'
-    arguments: '--configuration $(BuildConfiguration)'
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: Test
