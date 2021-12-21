@@ -15,9 +15,9 @@ variables:
 steps:
 - task: FileTransform@1
   inputs:
-    folderPath: '$(System.DefaultWorkingDirectory)'
-    fileType: 'json'
-    targetFiles: 'appsettings.json'
+    folderPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    targetFiles: '**/appsettings.json'
+    fileType: json
 - task: UseDotNet@2
   displayName: 'Use .NET Core sdk'
   inputs:
